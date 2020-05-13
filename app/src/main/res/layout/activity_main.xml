@@ -13,7 +13,8 @@
         android:layout_marginTop="100dp"
         android:textColor="#000"
         android:textSize="26sp"
-        android:textStyle="normal"/>
+        android:textStyle="normal"
+        android:text="Áudio captado"/>
 
     <ImageView
         android:id="@+id/btnSpeak"
@@ -34,5 +35,14 @@
         android:layout_centerHorizontal="true"
         android:layout_marginBottom="191dp"
         android:text="Translate" />
+
+    <TextView
+        android:id="@+id/txtGlosa"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="233dp"
+        android:text="Glosa" />
 
 </RelativeLayout>
