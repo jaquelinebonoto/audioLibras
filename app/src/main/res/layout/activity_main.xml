@@ -17,13 +17,22 @@
 
     <ImageView
         android:id="@+id/btnSpeak"
-        android:layout_width="100dp"
-        android:layout_height="100dp"
+        android:layout_width="55dp"
+        android:layout_height="65dp"
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
-        android:layout_marginBottom="60dp"
+        android:layout_marginBottom="96dp"
         android:gravity="center"
         android:onClick="getSpeechInput"
-        android:src="@drawable/ic_mic_black_24dp"/>
+        android:src="@drawable/ic_mic_black_24dp" />
+
+    <Button
+        android:id="@+id/btnSendToServer"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="191dp"
+        android:text="Translate" />
 
 </RelativeLayout>
