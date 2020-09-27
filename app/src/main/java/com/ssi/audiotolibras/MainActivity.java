@@ -9,9 +9,11 @@ import android.os.Bundle;
 import android.speech.RecognizerIntent;
 import android.util.Log;
 import android.view.View;
+import android.widget.Button;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.AuthFailureError;
 import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.Response;
@@ -23,10 +25,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Queue;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -34,12 +38,25 @@ public class MainActivity extends AppCompatActivity {
     private TextView txtResult;
     private TextView txtGlosa;
 
+    //post test
+    private RequestQueue requestQueue;
+    private Button btnSendToServer;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         txtResult = (TextView) findViewById(R.id.txvResult);
         txtGlosa = (TextView) findViewById(R.id.txtGlosa);
+
+        //post test
+        btnSendToServer = (Button)findViewById(R.id.btnSendToServer);
+
+        btnSendToServer.setOnClickListener((v) -> {
+            String data =
+            "{"+"\"text\"" + ":" + " " + "\"" + txtResult.getText().toString() + "\" "+"}";
+            post(data);
+        });
     }
 
     //ação que está associada a imagem do microfone
@@ -69,7 +86,6 @@ public class MainActivity extends AppCompatActivity {
                 if (resultCode == RESULT_OK && data != null) {
                     ArrayList<String> result = data.getStringArrayListExtra(RecognizerIntent.EXTRA_RESULTS);
                     txtResult.setText(result.get(0));
-                    post(result.get(0));
                 }
                 break;
         }
@@ -78,49 +94,44 @@ public class MainActivity extends AppCompatActivity {
 
     //requisição post
 
-    public void post(String words) {
+    public void post(String data) {
+        final String savedata = data;
         String url = "https://traducao2.vlibras.gov.br/translate";
-        StringRequest postRequest = new StringRequest(Request.Method.POST, url,
-                new Response.Listener<String>() {
-                    @Override
-                    public void onResponse(String response) {
-                        JSONArray jsonArray = null;
-                        try {
-                            jsonArray = new JSONArray(response);
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
+        Log.d("String url", url);
 
-                        JSONObject r = new JSONObject();
-                        JSONArray t;
-                        try {
-                            for (int i = 0; i < jsonArray.length(); i++) {
-                                JSONObject palavras = jsonArray.getJSONObject(i);
-                                String frase = palavras.getString("text");
-                                txtGlosa.setText(frase);
-                            }
-                        } catch (JSONException e) {
-                            e.printStackTrace();
-                        }
-                        Log.d("Reponse", response);
-                    }
-                },
-                new Response.ErrorListener() {
+        requestQueue = Volley.newRequestQueue(getApplicationContext());
+        StringRequest stringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
+            @Override
+            public void onResponse(String response) {
+                Log.d("Response", response);
+                txtGlosa.setText(response);
+            }
+        },
+                new Response.ErrorListener()
+                {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        Log.d("Error Response", error.toString());
+                        Log.d("ERROR","error => "+error.toString());
                     }
-                }
+        })
+        {
+            @Override
+            public String getBodyContentType(){ return "application/json; charset=utf-8";}
 
-        ) {
-            protected Map<String, String> getParams() {
-                Map<String, String> params = new HashMap<>();
-                params.put("text:", "teste");
-                return params;
+            @Override
+            public byte[] getBody() throws AuthFailureError {
+                Log.d("Request", savedata);
+                try{
+                    return savedata==null ? null : savedata.getBytes("utf-8");
+                }catch (UnsupportedEncodingException uee){
+                    return null;
+                }
             }
         };
-        RequestQueue queue = Volley.newRequestQueue(this);
-        queue.add(postRequest);
+        requestQueue.add(stringRequest);
+        Log.d("Data", data.toString());
+        Log.d("SaveData", savedata.toString());
+        Log.d("POST REQUEST", stringRequest.toString());
 
     }
 }
